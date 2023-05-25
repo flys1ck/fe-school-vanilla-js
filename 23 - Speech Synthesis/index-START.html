@@ -22,19 +22,54 @@
       <label for="pitch">Pitch:</label>
 
       <input name="pitch" type="range" min="0" max="2" step="0.1">
-      <textarea name="text">Hello! I love JavaScript 👍</textarea>
+      <textarea name="text">Hello! I love Comic Sans</textarea>
       <button id="stop">Stop!</button>
       <button id="speak">Speak</button>
 
     </div>
 
 <script>
-  const msg = new SpeechSynthesisUtterance();
-  let voices = [];
+   const textarea = document.querySelector('textarea');
+  // Definition: "utterance" - a spoken word, statement, or vocal sound.
+  const utterance = new SpeechSynthesisUtterance(textarea.value);
+  const synth = window.speechSynthesis;
   const voicesDropdown = document.querySelector('[name="voice"]');
+
+  synth.addEventListener('voiceschanged', () => {
+    const voices = synth.getVoices();
+    voices.forEach((voice) => {
+      const elem = document.createElement("option")
+      elem.value = voice.name
+      elem.innerText = voice.name
+      voicesDropdown.append(elem)
+    })
+
+    console.log("voices:", voices);
+  });
+
+  voicesDropdown.addEventListener("change", (e) => {
+    console.log(e.currentTarget.value)
+    const voice = e.currentTarget.value
+    utterance.voice = synth.getVoices().find((v) => v.name === voice)
+    console.log(utterance.voice)
+  })
+
   const options = document.querySelectorAll('[type="range"], [name="text"]');
+
   const speakButton = document.querySelector('#speak');
   const stopButton = document.querySelector('#stop');
+
+  speakButton.addEventListener("click", () => {
+    synth.speak(utterance)
+  })
+
+  options.forEach((option) => {
+    option.addEventListener("change", e => {
+      const name = e.currentTarget.name
+      const value = e.currentTarget.value
+      utterance[name] = value
+    })
+  })
 </script>
 
 </body>
